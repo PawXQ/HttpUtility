@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HttpUtility.Model
 {
-    internal class DeleteResult
+    public class DeleteResult
     {
         public bool IsSuccess { get; set; }
         public int StatusCode { get; set; }

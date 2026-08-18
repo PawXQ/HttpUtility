@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace HttpUtility.Utility
 {
-    internal class HttpRequest : IHttpRequest
+    public class HttpRequest : IHttpRequest
     {
         private string _baseUrl;
         public string BaseUrl { get => _baseUrl; set => _baseUrl = value; }
@@ -24,9 +24,10 @@ namespace HttpUtility.Utility
 
         public HttpRequest(string baseUrl, string token = null)
         {
-            BaseUrl = baseUrl;
+            this.BaseUrl = baseUrl;
+            this.Token = token;
 
-            HttpClient httpClient = new HttpClient();
+            this.httpClient = new HttpClient();
 
             httpClient.BaseAddress = new Uri(baseUrl);
 

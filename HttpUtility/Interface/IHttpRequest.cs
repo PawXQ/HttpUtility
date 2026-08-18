@@ -9,7 +9,7 @@ using HttpUtility.Model;
 
 namespace HttpUtility.Interface
 {
-    internal interface IHttpRequest
+    public interface IHttpRequest
     {
         Task<string> GetAsync(string url);
         Task<TResult> GetAsync<TResult>(string url, Dictionary<string, string> urlParam = null);
