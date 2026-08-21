@@ -14,7 +14,7 @@ namespace HttpUtility.Interface
         Task<string> GetAsync(string url);
         Task<TResult> GetAsync<TResult>(string url, Dictionary<string, string> urlParam = null);
         Task<string> PostAsync(string url, object input);
-        Task<TResult> PostAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null);
+        Task<TResult> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null);
         Task<TResult> PostAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null);
 
         Task<string> PatchAsync(string url, object input);
@@ -25,7 +25,8 @@ namespace HttpUtility.Interface
         Task<TResult> PutAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null);
         Task<string> PutAsync(string url, HttpContent content);
         Task<HttpResponseMessage> DeleteAsync(string url);
-        Task<DeleteResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null);
+        Task<HttpResponseMessage> DeleteAsync(string url, Dictionary<string, string> urlParam = null);
+        //Task<DeleteResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null);
 
         String BaseUrl { set; }
         String Token { set; get; }

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace HttpUtility.Model
 {
-    public class DeleteResult
-    {
-        public bool IsSuccess { get; set; }
-        public int StatusCode { get; set; }
-        public string Message { get; set; }
-    }
+    //public class DeleteResult
+    //{
+    //    public bool IsSuccess { get; set; }
+    //    public int StatusCode { get; set; }
+    //    public string Message { get; set; }
+    //}
 }

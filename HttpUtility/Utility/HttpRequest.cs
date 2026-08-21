@@ -56,8 +56,16 @@ namespace HttpUtility.Utility
 
         public async Task<string> PostAsync(string url, object input)
         {
-            string reqBody = JsonConvert.SerializeObject(input);
-            HttpContent content = new StringContent(reqBody);
+            HttpContent content;
+            if (input == null)
+            {
+                content = null;
+            }
+            else
+            {
+                string reqBody = JsonConvert.SerializeObject(input);
+                content = new StringContent(reqBody);
+            }
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
 
@@ -68,7 +76,7 @@ namespace HttpUtility.Utility
             return response;
         }
 
-        public async Task<TResult> PostAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null)
+        public async Task<TResult> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
@@ -125,19 +133,30 @@ namespace HttpUtility.Utility
             return responseMessage;
         }
 
-        public async Task<DeleteResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null)
+        public async Task<HttpResponseMessage> DeleteAsync(string url, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
             HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url);
 
-            return new DeleteResult
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase.ToString(),
-            };
+            responseMessage.EnsureSuccessStatusCode();
+
+            return responseMessage;
         }
+
+        //public async Task<DeleteResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null)
+        //{
+        //    url = buildQueryString(url, urlParam);
+
+        //    HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url);
+
+        //    return new DeleteResult
+        //    {
+        //        IsSuccess = responseMessage.IsSuccessStatusCode,
+        //        StatusCode = (int)responseMessage.StatusCode,
+        //        Message = responseMessage.ReasonPhrase.ToString(),
+        //    };
+        //}
 
         public async Task<string> PatchAsync(string url, object input)
         {
