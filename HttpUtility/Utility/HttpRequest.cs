@@ -34,131 +34,159 @@ namespace HttpUtility.Utility
             if (token != null) { httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}"); }
         }
 
-        public async Task<string> GetAsync(string url)
+        public async Task<ResponseResult<TResult>> GetAsync<TResult>(string url)
         {
             HttpResponseMessage responseMessage = await httpClient.GetAsync(url);
 
-            responseMessage.EnsureSuccessStatusCode();
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            string response = await responseMessage.Content.ReadAsStringAsync();
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
 
-            return response;
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
+
+            return responseResult;
         }
 
-        public async Task<TResult> GetAsync<TResult>(string url, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> GetAsync<TResult>(string url, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            string response = await GetAsync(url);
+            ResponseResult<TResult> responseResult = await GetAsync<TResult>(url);
 
-            return JsonConvert.DeserializeObject<TResult>(response);
+            return responseResult;
         }
 
-        public async Task<string> PostAsync(string url, object input)
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input)
         {
-            HttpContent content;
-            if (input == null)
-            {
-                content = null;
-            }
-            else
+            HttpContent content = null;
+            if (input != null)
             {
                 string reqBody = JsonConvert.SerializeObject(input);
-                content = new StringContent(reqBody);
+                content = new StringContent(reqBody, System.Text.Encoding.UTF8, "application/json");
             }
 
             HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            responseMessage.EnsureSuccessStatusCode();
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
 
-            string response = await responseMessage.Content.ReadAsStringAsync();
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
 
-            return response;
+            return responseResult;
         }
 
-        public async Task<TResult> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            string response = await PostAsync(url, input);
+            ResponseResult<TResult> responseResult = await PostAsync<TResult>(url, input);
 
-            return JsonConvert.DeserializeObject<TResult>(response);
+            return responseResult;
         }
 
-        public Task<TResult> PostAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> PutAsync(string url, object input)
+        public async Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input)
         {
             string reqBody = JsonConvert.SerializeObject(input);
             HttpContent content = new StringContent(reqBody);
 
             HttpResponseMessage responseMessage = await httpClient.PutAsync(url, content);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            responseMessage.EnsureSuccessStatusCode();
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
 
-            string response = await responseMessage.Content.ReadAsStringAsync();
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
 
-            return response;
+            return responseResult;
         }
 
-        public async Task<TResult> PutAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            string response = await PutAsync(url, input);
+            ResponseResult<TResult> responseResult = await PutAsync<TResult>(url, input);
 
-            return JsonConvert.DeserializeObject<TResult>(response);
+            return responseResult;
         }
 
-        public async Task<string> PutAsync(string url, HttpContent content)
+        public async Task<ResponseResult<TResult>> PutAsync<TResult>(string url, HttpContent content)
         {
-            HttpResponseMessage responseMessage = await httpClient.PutAsync(url, content);
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            responseMessage.EnsureSuccessStatusCode();
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
 
-            string response = await responseMessage.Content.ReadAsStringAsync();
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
 
-            return response;
+            return responseResult;
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string url)
+        public async Task<ResponseResult> DeleteAsync(string url)
         {
             HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            responseMessage.EnsureSuccessStatusCode();
+            ResponseResult responseResult = new ResponseResult
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
 
-            return responseMessage;
+            return responseResult;
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string url, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url);
+            ResponseResult responseResult = await DeleteAsync(url);
 
-            responseMessage.EnsureSuccessStatusCode();
-
-            return responseMessage;
+            return responseResult;
         }
 
-        //public async Task<DeleteResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null)
-        //{
-        //    url = buildQueryString(url, urlParam);
-
-        //    HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url);
-
-        //    return new DeleteResult
-        //    {
-        //        IsSuccess = responseMessage.IsSuccessStatusCode,
-        //        StatusCode = (int)responseMessage.StatusCode,
-        //        Message = responseMessage.ReasonPhrase.ToString(),
-        //    };
-        //}
-
-        public async Task<string> PatchAsync(string url, object input)
+        public async Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, object input)
         {
             string reqBody = JsonConvert.SerializeObject(input);
 
@@ -170,24 +198,35 @@ namespace HttpUtility.Utility
             };
 
             HttpResponseMessage responseMessage = await httpClient.SendAsync(request);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            responseMessage.EnsureSuccessStatusCode();
 
-            string response = await responseMessage.Content.ReadAsStringAsync();
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
 
-            return response;
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
+
+            return responseResult;
         }
 
-        public async Task<TResult> PatchAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            string response = await PatchAsync(url, input);
+            ResponseResult<TResult> responseResult = await PatchAsync<TResult>(url, input);
 
-            return JsonConvert.DeserializeObject<TResult>(response);
+            return responseResult;
         }
 
-        public Task<TResult> PatchAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
         {
             throw new NotImplementedException();
         }
@@ -208,7 +247,5 @@ namespace HttpUtility.Utility
 
             return url;
         }
-
-
     }
 }
