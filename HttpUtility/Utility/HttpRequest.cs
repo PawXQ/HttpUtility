@@ -104,7 +104,25 @@ namespace HttpUtility.Utility
 
         public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
         {
-            throw new NotImplementedException();
+            url = buildQueryString(url, urlParam);
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, input);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
+
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
+
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
+
+            return responseResult;
         }
 
         public async Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input)
@@ -228,7 +246,30 @@ namespace HttpUtility.Utility
 
         public async Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
         {
-            throw new NotImplementedException();
+            var patchMethod = new HttpMethod("PATCH");
+
+            var request = new HttpRequestMessage(patchMethod, url)
+            {
+                Content = input,
+            };
+
+            HttpResponseMessage responseMessage = await httpClient.SendAsync(request);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
+
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
+
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
+
+            return responseResult;
         }
 
         private string buildQueryString(string url, Dictionary<string, string> urlParam)
