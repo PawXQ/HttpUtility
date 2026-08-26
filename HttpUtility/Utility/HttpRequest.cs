@@ -65,6 +65,29 @@ namespace HttpUtility.Utility
             return responseResult;
         }
 
+        public async Task<ResponseResult> PostAsync(string url, object input)
+        {
+            HttpContent content = null;
+            if (input != null)
+            {
+                string reqBody = JsonConvert.SerializeObject(input);
+                content = new StringContent(reqBody, System.Text.Encoding.UTF8, "application/json");
+            }
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
+
+            ResponseResult responseResult = new ResponseResult
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
+
+            return responseResult;
+        }
+
         public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input)
         {
             HttpContent content = null;
@@ -89,6 +112,15 @@ namespace HttpUtility.Utility
             {
                 responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
             }
+
+            return responseResult;
+        }
+
+        public async Task<ResponseResult> PostAsync(string url, object input = null, Dictionary<string, string> urlParam = null)
+        {
+            url = buildQueryString(url, urlParam);
+
+            ResponseResult responseResult = await PostAsync(url, input);
 
             return responseResult;
         }
