@@ -17,11 +17,12 @@ namespace HttpUtility.Interface
         Task<ResponseResult> PostAsync(string url, object input);
         Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null);
         Task<ResponseResult> PostAsync(string url, object input = null, Dictionary<string, string> urlParam = null);
-        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null);
+        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null);
+        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartContent multipartContent, Dictionary<string, string> urlParam = null);
 
         Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, object input);
         Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null);
-        Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null);
+        Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null);
 
         Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input);
         Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null);

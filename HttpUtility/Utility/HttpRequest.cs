@@ -134,11 +134,34 @@ namespace HttpUtility.Utility
             return responseResult;
         }
 
-        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, input);
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, multipartFormDataContent);
+            string rawContent = await responseMessage.Content.ReadAsStringAsync();
+
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
+            {
+                IsSuccess = responseMessage.IsSuccessStatusCode,
+                StatusCode = (int)responseMessage.StatusCode,
+                Message = responseMessage.ReasonPhrase,
+                RawContent = rawContent
+            };
+
+            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
+            {
+                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
+            }
+
+            return responseResult;
+        }
+
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartContent multipartContent, Dictionary<string, string> urlParam = null)
+        {
+            url = buildQueryString(url, urlParam);
+
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, multipartContent);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
             ResponseResult<TResult> responseResult = new ResponseResult<TResult>
@@ -276,13 +299,13 @@ namespace HttpUtility.Utility
             return responseResult;
         }
 
-        public async Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, MultipartFormDataContent input, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null)
         {
             var patchMethod = new HttpMethod("PATCH");
 
             var request = new HttpRequestMessage(patchMethod, url)
             {
-                Content = input,
+                Content = multipartFormDataContent,
             };
 
             HttpResponseMessage responseMessage = await httpClient.SendAsync(request);
