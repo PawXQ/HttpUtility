@@ -13,12 +13,16 @@ namespace HttpUtility.Interface
     {
         Task<ResponseResult<TResult>> GetAsync<TResult>(string url);
         Task<ResponseResult<TResult>> GetAsync<TResult>(string url, Dictionary<string, string> urlParam = null);
-        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input);
+
         Task<ResponseResult> PostAsync(string url, object input);
-        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null);
         Task<ResponseResult> PostAsync(string url, object input = null, Dictionary<string, string> urlParam = null);
+        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input);
+        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, object input = null, Dictionary<string, string> urlParam = null);
+
+        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, HttpContent httpContent);
         Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null);
         Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartContent multipartContent, Dictionary<string, string> urlParam = null);
+        Task<ResponseResult<TResult>> PostAsync<TResult>(string url, HttpContent httpContent, Dictionary<string, string> urlParam = null);
 
         Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, object input);
         Task<ResponseResult<TResult>> PatchAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null);
@@ -26,7 +30,7 @@ namespace HttpUtility.Interface
 
         Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input);
         Task<ResponseResult<TResult>> PutAsync<TResult>(string url, object input, Dictionary<string, string> urlParam = null);
-        Task<ResponseResult<TResult>> PutAsync<TResult>(string url, HttpContent content);
+        Task<ResponseResult<TResult>> PutAsync<TResult>(string url, HttpContent httpContent);
 
         Task<ResponseResult> DeleteAsync(string url);
         Task<ResponseResult> DeleteAsync(string url, Dictionary<string, string> urlParam = null);

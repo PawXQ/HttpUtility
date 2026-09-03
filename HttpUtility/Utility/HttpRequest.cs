@@ -37,16 +37,9 @@ namespace HttpUtility.Utility
         public async Task<ResponseResult<TResult>> GetAsync<TResult>(string url)
         {
             HttpResponseMessage responseMessage = await httpClient.GetAsync(url);
-
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
@@ -77,13 +70,16 @@ namespace HttpUtility.Utility
             HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult responseResult = new ResponseResult
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult responseResult = new ResponseResult(responseMessage, rawContent);
+
+            return responseResult;
+        }
+
+        public async Task<ResponseResult> PostAsync(string url, object input = null, Dictionary<string, string> urlParam = null)
+        {
+            url = buildQueryString(url, urlParam);
+
+            ResponseResult responseResult = await PostAsync(url, input);
 
             return responseResult;
         }
@@ -100,27 +96,12 @@ namespace HttpUtility.Utility
             HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
                 responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
             }
-
-            return responseResult;
-        }
-
-        public async Task<ResponseResult> PostAsync(string url, object input = null, Dictionary<string, string> urlParam = null)
-        {
-            url = buildQueryString(url, urlParam);
-
-            ResponseResult responseResult = await PostAsync(url, input);
 
             return responseResult;
         }
@@ -134,20 +115,12 @@ namespace HttpUtility.Utility
             return responseResult;
         }
 
-        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null)
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, HttpContent httpContent)
         {
-            url = buildQueryString(url, urlParam);
-
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, multipartFormDataContent);
+            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, httpContent);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
@@ -157,25 +130,29 @@ namespace HttpUtility.Utility
             return responseResult;
         }
 
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartFormDataContent multipartFormDataContent, Dictionary<string, string> urlParam = null)
+        {
+            url = buildQueryString(url, urlParam);
+
+            ResponseResult<TResult> responseResult = await PostAsync<TResult>(url, httpContent: multipartFormDataContent);
+
+            return responseResult;
+        }
+
         public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, MultipartContent multipartContent, Dictionary<string, string> urlParam = null)
         {
             url = buildQueryString(url, urlParam);
 
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, multipartContent);
-            string rawContent = await responseMessage.Content.ReadAsStringAsync();
+            ResponseResult<TResult> responseResult = await PostAsync<TResult>(url, httpContent: multipartContent);
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            return responseResult;
+        }
 
-            if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
-            {
-                responseResult.Data = JsonConvert.DeserializeObject<TResult>(rawContent);
-            }
+        public async Task<ResponseResult<TResult>> PostAsync<TResult>(string url, HttpContent httpContent, Dictionary<string, string> urlParam = null)
+        {
+            url = buildQueryString(url, urlParam);
+
+            ResponseResult<TResult> responseResult = await PostAsync<TResult>(url, httpContent: httpContent);
 
             return responseResult;
         }
@@ -188,13 +165,7 @@ namespace HttpUtility.Utility
             HttpResponseMessage responseMessage = await httpClient.PutAsync(url, content);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
@@ -213,18 +184,12 @@ namespace HttpUtility.Utility
             return responseResult;
         }
 
-        public async Task<ResponseResult<TResult>> PutAsync<TResult>(string url, HttpContent content)
+        public async Task<ResponseResult<TResult>> PutAsync<TResult>(string url, HttpContent httpContent)
         {
-            HttpResponseMessage responseMessage = await httpClient.PostAsync(url, content);
+            HttpResponseMessage responseMessage = await httpClient.PutAsync(url, httpContent);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
@@ -239,13 +204,7 @@ namespace HttpUtility.Utility
             HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult responseResult = new ResponseResult
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult responseResult = new ResponseResult(responseMessage, rawContent);
 
             return responseResult;
         }
@@ -273,14 +232,7 @@ namespace HttpUtility.Utility
             HttpResponseMessage responseMessage = await httpClient.SendAsync(request);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
@@ -311,13 +263,7 @@ namespace HttpUtility.Utility
             HttpResponseMessage responseMessage = await httpClient.SendAsync(request);
             string rawContent = await responseMessage.Content.ReadAsStringAsync();
 
-            ResponseResult<TResult> responseResult = new ResponseResult<TResult>
-            {
-                IsSuccess = responseMessage.IsSuccessStatusCode,
-                StatusCode = (int)responseMessage.StatusCode,
-                Message = responseMessage.ReasonPhrase,
-                RawContent = rawContent
-            };
+            ResponseResult<TResult> responseResult = new ResponseResult<TResult>(responseMessage, rawContent);
 
             if (responseMessage.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(rawContent))
             {
